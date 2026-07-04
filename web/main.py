@@ -2,11 +2,11 @@
 import os
 import sys
 
-sys.path.append("/content")
+# sys.path.append("/content")
 
 import streamlit as st
 
-from PAMU_BOAT.database.query import get_ai
+from database.query import get_ai
 
 st.set_page_config(
     page_title="PAMU BOAT",
