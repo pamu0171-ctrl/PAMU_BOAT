@@ -1,0 +1,63 @@
+
+import pandas as pd
+
+from PAMU_BOAT.database.db import connect
+
+
+def get_race(place, race):
+
+    conn = connect()
+
+    df = pd.read_sql(
+        f"""
+        SELECT *
+        FROM race_data
+        WHERE 場コード={place}
+        AND レース={race}
+        """,
+        conn
+    )
+
+    conn.close()
+
+    df = df.sort_values(
+        "AI確率%",
+        ascending=False
+    )
+
+    return df
+
+
+def get_today():
+
+    conn = connect()
+
+    df = pd.read_sql(
+        """
+        SELECT DISTINCT
+            場コード,
+            レース
+        FROM race_data
+        ORDER BY 場コード, レース
+        """,
+        conn
+    )
+
+    conn.close()
+
+    return df
+
+
+def get_ai(place, race):
+
+    df = get_race(place, race)
+
+    return df[
+        [
+            "枠",
+            "選手名",
+            "級別",
+            "AI確率%",
+            "AI評価"
+        ]
+    ]
