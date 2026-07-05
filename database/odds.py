@@ -15,9 +15,14 @@ def get_odds(place, race):
     "Connection": "keep-alive"
 }
 
-    html = requests.get(
+    session = requests.Session()
+
+session.headers.update(headers)
+
+session.get("https://www.boatrace.jp")
+
+html = session.get(
     url,
-    headers=headers,
     timeout=30
 )
     
