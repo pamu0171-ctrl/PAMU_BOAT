@@ -1,5 +1,5 @@
 
-DB_PATH = "PAMU_BOAT/data/pamu_boat.db"
+DB_PATH = "data/pamu_boat.db"
 
 VERSION = "0.1.0"
 
