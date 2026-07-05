@@ -26,4 +26,8 @@ race = st.number_input("レース", 1, 12, 1)
 
 st.subheader("AI予想")
 
-st.dataframe(get_ai(place, race), use_container_width=True)
+st.dataframe(
+    get_ai(place, race),
+    use_container_width=True,
+    hide_index=True,
+)
