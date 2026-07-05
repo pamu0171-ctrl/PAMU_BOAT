@@ -17,9 +17,3 @@ def get_odds(place, race):
             "オッズ"
         ]
     )
-    return pd.DataFrame(
-        columns=[
-            "買い目",
-            "オッズ"
-        ]
-    )
