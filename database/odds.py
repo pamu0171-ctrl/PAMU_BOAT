@@ -14,11 +14,12 @@ def get_odds(place, race):
     "Referer": "https://www.boatrace.jp/",
     "Connection": "keep-alive"
 }
-
-        html = requests.get(
+    html = requests.get(
         url,
         headers=headers,
         timeout=30
+    )
+
     )
 
     print("STATUS:", html.status_code)
