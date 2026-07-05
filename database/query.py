@@ -2,6 +2,7 @@
 import pandas as pd
 
 from database.db import connect
+from database.odds import get_odds
 
 
 def get_race(place, race):
