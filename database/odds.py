@@ -20,7 +20,7 @@ def get_odds(place, race):
         timeout=30
     )
 
-    )
+
 
     print("STATUS:", html.status_code)
     print("URL:", html.url)
