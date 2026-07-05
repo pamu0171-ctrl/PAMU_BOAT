@@ -20,7 +20,16 @@ def create_tables():
                 race_no INTEGER,
                 race_type TEXT
 　　　　　　　　) 
+        cur.execute("""
+CREATE TABLE IF NOT EXISTS entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    race_id INTEGER,
+    boat_no INTEGER,
+    racer_id INTEGER,
+    motor_no INTEGER
+)
 """)
+
     
     conn.commit()
     conn.close()
