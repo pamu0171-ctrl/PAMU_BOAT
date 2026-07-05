@@ -14,7 +14,7 @@ def get_odds(place, race):
     html = requests.get(
         url,
         headers=headers,
-        timeout=10
+        timeout=30
     )
 
     print("STATUS:", html.status_code)
