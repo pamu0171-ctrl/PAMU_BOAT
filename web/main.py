@@ -28,6 +28,9 @@ st.subheader("AI予想")
 df = get_ai(place, race)
 
 st.write(f"◎ 本命：{df.iloc[0]['枠']}号艇 {df.iloc[0]['選手名']}")
-
+st.write("🎯 推奨買い目")
+st.write(f"{df.iloc[0]['枠']}-{df.iloc[1]['枠']}-{df.iloc[2]['枠']}")
+st.write(f"{df.iloc[0]['枠']}-{df.iloc[2]['枠']}-{df.iloc[1]['枠']}")
+st.write(f"{df.iloc[1]['枠']}-{df.iloc[0]['枠']}-{df.iloc[2]['枠']}")
 st.dataframe(df, use_container_width=True, hide_index=True)
 
