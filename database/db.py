@@ -1,9 +1,11 @@
-
 import sqlite3
+import os
 
-from config import DB_PATH
-
+DB_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)),
+    "data",
+    "pamu_boat.db",
+)
 
 def connect():
-
     return sqlite3.connect(DB_PATH)
