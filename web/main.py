@@ -10,7 +10,7 @@ sys.path.append(
 )
 import streamlit as st
 
-from database.query import get_ai
+from database.query import get_ai, get_odds_table
 
 st.set_page_config(
     page_title="PAMU BOAT",
@@ -45,4 +45,12 @@ st.dataframe(df, use_container_width=True, hide_index=True)
 st.subheader("🚨 被弾レーダー")
 st.write(f"危険度：{danger}")
 st.write(comment)
+st.subheader("📊 オッズ")
 
+odds = get_odds_table(place, race)
+
+st.dataframe(
+    odds,
+    use_container_width=True,
+    hide_index=True
+)
