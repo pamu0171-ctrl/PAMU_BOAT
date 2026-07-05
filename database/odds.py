@@ -16,7 +16,8 @@ def get_odds(place, race):
 }
 
     html = requests.get(
-    "https://www.google.com",
+    url,
+    headers=headers,
     timeout=30
 )
     
