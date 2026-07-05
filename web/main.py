@@ -6,7 +6,7 @@ import sys
 
 import streamlit as st
 
-from PAMU_BOAT.database.query import get_ai
+from from database.query import get_ai
 
 st.set_page_config(
     page_title="PAMU BOAT",
