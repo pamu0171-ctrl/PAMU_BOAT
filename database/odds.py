@@ -19,6 +19,7 @@ def get_odds(place, race):
 
     print("STATUS:", html.status_code)
     print("URL:", html.url)
+    print("FINAL URL:", url)
     print("CONTENT-TYPE:", html.headers.get("content-type"))
     print(html.text[:1000])
 
