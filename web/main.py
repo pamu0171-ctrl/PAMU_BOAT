@@ -3,7 +3,11 @@ import os
 import sys
 
 # sys.path.append("/content")
-
+sys.path.append(
+    os.path.dirname(
+        os.path.dirname(__file__)
+    )
+)
 import streamlit as st
 
 from database.query import get_ai
