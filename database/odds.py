@@ -11,13 +11,20 @@ def get_odds(place, race):
         "User-Agent": "Mozilla/5.0"
     }
 
-    html = requests.get(url, headers=headers)
+    html = requests.get(
+        url,
+        headers=headers,
+        timeout=10
+    )
 
-    print(html.status_code)
+    print("STATUS:", html.status_code)
+    print("URL:", html.url)
+    print("CONTENT-TYPE:", html.headers.get("content-type"))
     print(html.text[:1000])
 
     soup = BeautifulSoup(html.text, "html.parser")
-    print(soup.title)
+    print("TITLE:", soup.title)
+
     return pd.DataFrame(
         [[str(soup.title), html.status_code]],
         columns=["買い目", "オッズ"]
