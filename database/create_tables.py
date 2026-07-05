@@ -29,7 +29,15 @@ CREATE TABLE IF NOT EXISTS entries (
     motor_no INTEGER
 )
 """)
-
+cur.execute("""
+CREATE TABLE IF NOT EXISTS odds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    race_id INTEGER,
+    bet_type TEXT,
+    combination TEXT,
+    odds REAL
+)
+""")
     
     conn.commit()
     conn.close()
