@@ -25,9 +25,9 @@ place = st.number_input("場コード", 1, 24, 1)
 race = st.number_input("レース", 1, 12, 1)
 
 st.subheader("AI予想")
+df = get_ai(place, race)
 
-st.dataframe(
-    get_ai(place, race),
-    use_container_width=True,
-    hide_index=True,
-)
+st.write(f"◎ 本命：{df.iloc[0]['枠']}号艇 {df.iloc[0]['選手名']}")
+
+st.dataframe(df, use_container_width=True, hide_index=True)
+
