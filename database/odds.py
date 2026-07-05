@@ -26,6 +26,9 @@ def get_odds(place, race):
     print("TITLE:", soup.title)
 
     return pd.DataFrame(
-        [[str(soup.title), html.status_code]],
-        columns=["買い目", "オッズ"]
-    )
+    [[
+        str(soup.title),
+        len(soup.select("table"))
+    ]],
+    columns=["買い目", "オッズ"]
+)
