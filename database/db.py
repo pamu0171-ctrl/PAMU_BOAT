@@ -1,7 +1,7 @@
 
 import sqlite3
 
-from PAMU_BOAT.config import DB_PATH
+from config import DB_PATH
 
 
 def connect():
