@@ -15,6 +15,9 @@ def get_odds(place, race):
 
     print(html.status_code)
     print(html.text[:1000])
+
+    soup = BeautifulSoup(html.text, "html.parser")
+    print(soup.title)
     return pd.DataFrame(
         [["接続成功", html.status_code]],
         columns=["買い目", "オッズ"]
