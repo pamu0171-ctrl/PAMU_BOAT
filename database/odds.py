@@ -14,7 +14,7 @@ def get_odds(place, race):
     html = requests.get(url, headers=headers)
 
     print(html.status_code)
-print(html.text[:1000])
+    print(html.text[:1000])
     return pd.DataFrame(
         [["接続成功", html.status_code]],
         columns=["買い目", "オッズ"]
