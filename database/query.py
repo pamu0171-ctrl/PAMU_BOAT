@@ -1,7 +1,7 @@
 
 import pandas as pd
 
-from PAMU_BOAT.database.db import connect
+from database.db import connect
 
 
 def get_race(place, race):
