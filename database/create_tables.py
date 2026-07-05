@@ -11,6 +11,16 @@ def create_tables():
             grade TEXT,
             branch TEXT
         )
-    """)
+        cur.execute("""
+　　　　　　　　CREATE TABLE IF NOT EXISTS races (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                race_code TEXT UNIQUE,
+                race_date TEXT,
+                stadium TEXT,
+                race_no INTEGER,
+                race_type TEXT
+　　　　　　　　) 
+""")
+    
     conn.commit()
     conn.close()
