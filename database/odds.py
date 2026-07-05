@@ -1,19 +1,21 @@
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
 
 def get_odds(place, race):
-    data = [
-        ["1-2-3", 7.9],
-        ["1-2-4", 5.1],
-        ["1-2-5", 14.6],
-        ["1-2-6", 13.7],
-        ["1-3-2", 19.3],
-    ]
+
+    url = f"https://www.boatrace.jp/owpc/pc/race/odds3t?rno={race}&jcd={place:02d}"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
+    html = requests.get(url, headers=headers)
+
+    print(html.status_code)
 
     return pd.DataFrame(
-        data,
-        columns=[
-            "買い目",
-            "オッズ",
-        ],
+        [["接続成功", html.status_code]],
+        columns=["買い目", "オッズ"]
     )
