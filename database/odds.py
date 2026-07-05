@@ -2,7 +2,7 @@ import pandas as pd
 
 
 def get_odds(place, race):
-        data = [
+    data = [
         ["1-2-3", 7.9],
         ["1-2-4", 5.1],
         ["1-2-5", 14.6],
@@ -14,6 +14,6 @@ def get_odds(place, race):
         data,
         columns=[
             "買い目",
-            "オッズ"
-        ]
+            "オッズ",
+        ],
     )
