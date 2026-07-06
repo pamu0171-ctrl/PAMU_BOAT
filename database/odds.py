@@ -2,8 +2,6 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-print("ODDS.PY LOADED")
-
 
 def get_odds(place, race, date):
 
@@ -13,17 +11,8 @@ def get_odds(place, race, date):
     )
 
     headers = {
-        "User-Agent": (
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/138.0.0.0 Safari/537.36"
-        ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
-        "Referer": "https://www.boatrace.jp/",
-        "Connection": "keep-alive",
-        "Upgrade-Insecure-Requests": "1",
-        "Cache-Control": "max-age=0"
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://www.boatrace.jp/"
     }
 
     response = requests.get(
@@ -32,24 +21,44 @@ def get_odds(place, race, date):
         timeout=30
     )
 
-    print("STATUS:", response.status_code)
-    print("URL:", response.url)
-    print("CONTENT-TYPE:", response.headers.get("content-type"))
-
     soup = BeautifulSoup(response.text, "html.parser")
+
+    odds_cells = soup.select("td.oddsPoint")
+    odds_values = [
+        cell.get_text(strip=True)
+        for cell in odds_cells
+    ]
 
     rows = []
 
-    for table in soup.select("table"):
-        for tr in table.select("tr"):
+    if len(odds_values) < 120:
+        return pd.DataFrame(
+            [[
+                "取得失敗",
+                f"oddsPoint数: {len(odds_values)}"
+            ]],
+            columns=["買い目", "オッズ"]
+        )
 
-            cols = [
-                td.get_text(" ", strip=True)
-                for td in tr.select("td")
-            ]
+    for first in range(1, 7):
+        row_index = 0
 
-            if len(cols) >= 2:
-                rows.append(cols[:2])
+        for second in range(1, 7):
+            if second == first:
+                continue
+
+            for third in range(1, 7):
+                if third == first or third == second:
+                    continue
+
+                odds_index = row_index * 6 + (first - 1)
+
+                rows.append([
+                    f"{first}-{second}-{third}",
+                    odds_values[odds_index]
+                ])
+
+                row_index += 1
 
     return pd.DataFrame(
         rows,
