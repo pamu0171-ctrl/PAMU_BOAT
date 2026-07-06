@@ -49,7 +49,7 @@ def get_today():
     return df
 
 
-def get_ai(place, race):
+def get_ai(place, race, date):
 
     df = get_race(place, race)
 
