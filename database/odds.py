@@ -5,41 +5,45 @@ from bs4 import BeautifulSoup
 
 def get_odds(place, race, date):
 
-    url = f"https://www.boatrace.jp/owpc/pc/race/odds3t?hd={date}&jcd={place:02d}&rno={race}"
+    url = (
+        f"https://www.boatrace.jp/owpc/pc/race/odds3t"
+        f"?hd={date}&jcd={place:02d}&rno={race}"
+    )
 
     headers = {
-        "User-Agent": "Mozilla/5.0",
-        "Referer": "https://www.boatrace.jp/"
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/138.0.0.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
+        "Referer": "https://www.boatrace.jp/",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Cache-Control": "max-age=0"
     }
 
-    html = requests.get(
+    response = requests.get(
         url,
         headers=headers,
         timeout=30
     )
 
-    soup = BeautifulSoup(html.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html.parser")
 
     rows = []
 
     for table in soup.select("table"):
-
         for tr in table.select("tr"):
-
-            tds = tr.select("td")
-
-            if len(tds) < 2:
-                continue
 
             cols = [
                 td.get_text(" ", strip=True)
-                for td in tds
+                for td in tr.select("td")
             ]
 
-            rows.append([
-                cols[0],
-                cols[1]
-            ])
+            if len(cols) >= 2:
+                rows.append(cols[:2])
 
     return pd.DataFrame(
         rows,
