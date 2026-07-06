@@ -62,4 +62,3 @@ def get_ai(place, race):
             "AI評価"
         ]
     ]
-    return get_odds(place, race, date)
