@@ -2,6 +2,8 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+print("ODDS.PY LOADED")
+
 
 def get_odds(place, race, date):
 
@@ -34,17 +36,11 @@ def get_odds(place, race, date):
     print("URL:", response.url)
     print("CONTENT-TYPE:", response.headers.get("content-type"))
 
-    with open("debug.html", "w", encoding="utf-8") as f:
-        f.write(response.text)
-
     soup = BeautifulSoup(response.text, "html.parser")
 
     rows = []
 
-    for table_no, table in enumerate(soup.select("table")):
-
-        print(f"TABLE {table_no}")
-
+    for table in soup.select("table"):
         for tr in table.select("tr"):
 
             cols = [
