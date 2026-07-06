@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 def get_odds(place, race):
 
-    url = "https://www.boatrace.jp/owpc/pc/race/odds3t?rno={race}&jcd={place:02d}"
+    url = f"https://www.boatrace.jp/owpc/pc/race/odds3t?rno={race}&jcd={place:02d}"
 
     headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
