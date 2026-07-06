@@ -5,7 +5,7 @@ from database.db import connect
 from database.odds import get_odds
 
 
-def get_race(place, race):
+def get_odds_table(place, race, date):
 
     conn = connect()
 
@@ -62,5 +62,4 @@ def get_ai(place, race):
             "AI評価"
         ]
     ]
-def get_odds_table(place, race):
-    return get_odds(place, race)
+    return get_odds(place, race, date)
