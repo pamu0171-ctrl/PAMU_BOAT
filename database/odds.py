@@ -37,14 +37,16 @@ def get_odds(place, race, date):
     for i, table in enumerate(tables):
         print(f"TABLE {i}")
         print(table.get_text()[:500])
+rows = []
 
-    return pd.DataFrame(
-    [[
-        f"{html.status_code} | {html.url}",
-        soup.select_one("body").get_text(" ", strip=True)[:300]
-    ]],
+for table in tables:
+    for tr in table.select("tr"):
+        cols = [td.get_text(" ", strip=True) for td in tr.select("td")]
+
+        if len(cols) >= 2:
+            rows.append(cols[:2])
+
+return pd.DataFrame(
+    rows,
     columns=["買い目", "オッズ"]
 )
-    
-
-  
