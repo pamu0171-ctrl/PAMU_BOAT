@@ -30,11 +30,21 @@ def get_odds(place, race, date):
         timeout=30
     )
 
+    print("STATUS:", response.status_code)
+    print("URL:", response.url)
+    print("CONTENT-TYPE:", response.headers.get("content-type"))
+
+    with open("debug.html", "w", encoding="utf-8") as f:
+        f.write(response.text)
+
     soup = BeautifulSoup(response.text, "html.parser")
 
     rows = []
 
-    for table in soup.select("table"):
+    for table_no, table in enumerate(soup.select("table")):
+
+        print(f"TABLE {table_no}")
+
         for tr in table.select("tr"):
 
             cols = [
