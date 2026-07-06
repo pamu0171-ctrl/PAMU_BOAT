@@ -39,12 +39,12 @@ def get_odds(place, race):
         print(table.get_text()[:500])
 
     return pd.DataFrame(
-        [[
-            str(soup.title),
-            len(tables)
-        ]],
-        columns=["買い目", "オッズ"]
-    )
+    [[
+        f"{html.status_code} | {html.url}",
+        soup.title.string if soup.title else "NO TITLE"
+    ]],
+    columns=["買い目", "オッズ"]
+)
     
 
   
