@@ -20,17 +20,26 @@ def get_odds(place, race, date):
 
     soup = BeautifulSoup(html.text, "html.parser")
 
-    tables = soup.select("table")
-
     rows = []
 
-    for i, table in enumerate(tables):
-        text = table.get_text(" ", strip=True)
+    for table in soup.select("table"):
 
-        rows.append([
-            f"TABLE {i}",
-            text[:300]
-        ])
+        for tr in table.select("tr"):
+
+            tds = tr.select("td")
+
+            if len(tds) < 2:
+                continue
+
+            cols = [
+                td.get_text(" ", strip=True)
+                for td in tds
+            ]
+
+            rows.append([
+                cols[0],
+                cols[1]
+            ])
 
     return pd.DataFrame(
         rows,
