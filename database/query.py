@@ -1,4 +1,3 @@
-
 import pandas as pd
 
 from database.db import connect
@@ -7,26 +6,7 @@ from database.odds import get_odds
 
 def get_odds_table(place, race, date):
 
-    conn = connect()
-
-    df = pd.read_sql(
-        f"""
-        SELECT *
-        FROM race_data
-        WHERE 場コード={place}
-        AND レース={race}
-        """,
-        conn
-    )
-
-    conn.close()
-
-    df = df.sort_values(
-        "AI確率%",
-        ascending=False
-    )
-
-    return df
+    return get_odds(place, race, date)
 
 
 def get_today():
@@ -51,7 +31,24 @@ def get_today():
 
 def get_ai(place, race, date):
 
-    df = get_race(place, race)
+    conn = connect()
+
+    df = pd.read_sql(
+        f"""
+        SELECT *
+        FROM race_data
+        WHERE 場コード={place}
+        AND レース={race}
+        """,
+        conn
+    )
+
+    conn.close()
+
+    df = df.sort_values(
+        "AI確率%",
+        ascending=False
+    )
 
     return df[
         [
