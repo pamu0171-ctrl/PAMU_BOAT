@@ -25,7 +25,7 @@ place = st.number_input("場コード", 1, 24, 1)
 race = st.number_input("レース", 1, 12, 1)
 date = st.text_input("開催日（YYYYMMDD）", "20260705")
 st.subheader("AI予想")
-df = get_ai(place, race)
+df = get_ai(place, race, date)
 ai_diff = df.iloc[0]["AI確率%"] - df.iloc[1]["AI確率%"]
 if ai_diff >= 20:
     danger = "★☆☆☆☆"
