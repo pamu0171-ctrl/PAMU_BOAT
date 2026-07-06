@@ -23,7 +23,7 @@ st.title("🚤 PAMU BOAT β")
 place = st.number_input("場コード", 1, 24, 1)
 
 race = st.number_input("レース", 1, 12, 1)
-
+date = st.text_input("開催日（YYYYMMDD）", "20260705")
 st.subheader("AI予想")
 df = get_ai(place, race)
 ai_diff = df.iloc[0]["AI確率%"] - df.iloc[1]["AI確率%"]
@@ -47,7 +47,7 @@ st.write(f"危険度：{danger}")
 st.write(comment)
 st.subheader("📊 オッズ")
 
-odds = get_odds_table(place, race)
+odds = get_odds_table(place, race, date)
 
 st.dataframe(
     odds,
