@@ -1,7 +1,7 @@
 
 import pandas as pd
 
-from database.db import connect
+from database.db import connect, get_race
 from database.odds import get_odds
 
 
