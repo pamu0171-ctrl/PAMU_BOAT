@@ -8,11 +8,8 @@ def get_odds(place, race, date):
     url = f"https://www.boatrace.jp/owpc/pc/race/odds3t?hd={date}&jcd={place:02d}&rno={race}"
 
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "ja,en-US;q=0.9,en;q=0.8",
-        "Referer": "https://www.boatrace.jp/",
-        "Connection": "keep-alive"
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://www.boatrace.jp/"
     }
 
     html = requests.get(
@@ -21,34 +18,19 @@ def get_odds(place, race, date):
         timeout=30
     )
 
-    print("STATUS:", html.status_code)
-    print("URL:", html.url)
-    print("FINAL URL:", url)
-    print("CONTENT-TYPE:", html.headers.get("content-type"))
-
     soup = BeautifulSoup(html.text, "html.parser")
 
     tables = soup.select("table")
 
-    print("TABLE COUNT:", len(tables))
-
-    for i, table in enumerate(tables):
-        print("=" * 60)
-        print(f"TABLE {i}")
-        print("CLASS:", table.get("class"))
-        print(table.get_text(" ", strip=True)[:1000])
-
     rows = []
 
-    for table in tables:
-        for tr in table.select("tr"):
-            cols = [
-                td.get_text(" ", strip=True)
-                for td in tr.select("td")
-            ]
+    for i, table in enumerate(tables):
+        text = table.get_text(" ", strip=True)
 
-            if len(cols) >= 2:
-                rows.append(cols[:2])
+        rows.append([
+            f"TABLE {i}",
+            text[:300]
+        ])
 
     return pd.DataFrame(
         rows,
