@@ -26,7 +26,7 @@ def get_odds(place, race):
     print("URL:", html.url)
     print("FINAL URL:", url)
     print("CONTENT-TYPE:", html.headers.get("content-type"))
-    print(html.text[:1000])
+    print(html.text[:5000])
 
     soup = BeautifulSoup(html.text, "html.parser")
     print("TITLE:", soup.title)
@@ -41,7 +41,7 @@ def get_odds(place, race):
     return pd.DataFrame(
     [[
         f"{html.status_code} | {html.url}",
-        soup.title.string if soup.title else "NO TITLE"
+        soup.select_one("body").get_text(" ", strip=True)[:300]
     ]],
     columns=["買い目", "オッズ"]
 )
