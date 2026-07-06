@@ -18,10 +18,98 @@ st.set_page_config(
     layout="wide"
 )
 
+BOAT_COLORS = {
+    1: "#ffffff",
+    2: "#222222",
+    3: "#e94b5b",
+    4: "#3f8df5",
+    5: "#f4e34f",
+    6: "#31b56a",
+}
+
+BOAT_TEXT = {
+    1: "#111111",
+    2: "#ffffff",
+    3: "#ffffff",
+    4: "#ffffff",
+    5: "#111111",
+    6: "#ffffff",
+}
+
+
+def boat_badge(num):
+    bg = BOAT_COLORS[num]
+    fg = BOAT_TEXT[num]
+    return (
+        f"<span style='display:inline-block;min-width:28px;"
+        f"padding:4px 8px;border-radius:6px;background:{bg};"
+        f"color:{fg};font-weight:700;text-align:center;"
+        f"border:1px solid #555;'>{num}</span>"
+    )
+
+
+def make_matrix_html(matrix, head):
+    html = """
+    <style>
+    .odds-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 6px;
+        font-size: 18px;
+    }
+    .odds-table th {
+        text-align: center;
+        padding: 6px;
+    }
+    .odds-table td {
+        text-align: center;
+        padding: 10px 6px;
+        border-radius: 8px;
+        background: #1f232b;
+        border: 1px solid #333844;
+        min-width: 58px;
+    }
+    .odds-empty {
+        background: transparent !important;
+        border: none !important;
+    }
+    .odds-value {
+        font-weight: 700;
+        font-size: 18px;
+    }
+    </style>
+    """
+
+    html += "<div style='margin-bottom:10px;'>"
+    html += f"<b>1着固定：</b> {boat_badge(head)}"
+    html += "</div>"
+
+    html += "<table class='odds-table'>"
+    html += "<tr><th>3着＼2着</th>"
+
+    for col in matrix.columns:
+        html += f"<th>{boat_badge(int(col))}</th>"
+
+    html += "</tr>"
+
+    for idx, row in matrix.iterrows():
+        html += f"<tr><th>{boat_badge(int(idx))}</th>"
+
+        for val in row:
+            if val == "":
+                html += "<td class='odds-empty'></td>"
+            else:
+                html += f"<td><span class='odds-value'>{val}</span></td>"
+
+        html += "</tr>"
+
+    html += "</table>"
+    return html
+
+
 st.title("🚤 PAMU BOAT β")
 
 place = st.number_input("場コード", 1, 24, 1)
-
 race = st.number_input("レース", 1, 12, 1)
 
 date = st.text_input(
@@ -54,11 +142,9 @@ st.write("🎯 推奨買い目")
 st.write(
     f"{df.iloc[0]['枠']}-{df.iloc[1]['枠']}-{df.iloc[2]['枠']}"
 )
-
 st.write(
     f"{df.iloc[0]['枠']}-{df.iloc[2]['枠']}-{df.iloc[1]['枠']}"
 )
-
 st.write(
     f"{df.iloc[1]['枠']}-{df.iloc[0]['枠']}-{df.iloc[2]['枠']}"
 )
@@ -70,7 +156,6 @@ st.dataframe(
 )
 
 st.subheader("🚨 被弾レーダー")
-
 st.write(f"危険度：{danger}")
 st.write(comment)
 
@@ -79,6 +164,12 @@ st.subheader("📊 オッズ")
 head = st.radio(
     "1着固定",
     [1, 2, 3, 4, 5, 6],
+    horizontal=True
+)
+
+mode = st.radio(
+    "表示方法",
+    ["公式風", "一覧", "マトリクス"],
     horizontal=True
 )
 
@@ -91,16 +182,6 @@ odds = get_odds_table(
 odds = odds[
     odds["買い目"].str.startswith(f"{head}-")
 ].copy()
-
-# ---------------------------------
-# 一覧表示 / マトリクス表示
-# ---------------------------------
-
-mode = st.radio(
-    "表示方法",
-    ["一覧", "マトリクス"],
-    horizontal=True
-)
 
 if mode == "一覧":
 
@@ -122,7 +203,6 @@ else:
     )
 
     for _, row in odds.iterrows():
-
         first, second, third = map(
             int,
             row["買い目"].split("-")
@@ -133,9 +213,14 @@ else:
             second
         ] = row["オッズ"]
 
-    st.write("行 = 3着　　列 = 2着")
-
-    st.dataframe(
-        matrix,
-        use_container_width=True
-    )
+    if mode == "マトリクス":
+        st.write("行 = 3着　　列 = 2着")
+        st.dataframe(
+            matrix,
+            use_container_width=True
+        )
+    else:
+        st.markdown(
+            make_matrix_html(matrix, head),
+            unsafe_allow_html=True
+        )
