@@ -78,11 +78,14 @@ def get_active_places(date):
         "Referer": "https://www.boatrace.jp/"
     }
 
-    response = requests.get(
-        url,
-        headers=headers,
-        timeout=30
-    )
+    try:
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=30
+        )
+    except Exception:
+        return []
 
     soup = BeautifulSoup(response.text, "html.parser")
 
@@ -116,7 +119,7 @@ def boat_badge(num):
 
 
 def make_matrix_html(matrix, head):
-    html = '''
+    html = """
     <style>
     .odds-table {
         width: 100%;
@@ -145,7 +148,7 @@ def make_matrix_html(matrix, head):
         font-size: 18px;
     }
     </style>
-    '''
+    """
 
     html += "<div style='margin-bottom:10px;'>"
     html += f"<b>1着固定：</b> {boat_badge(head)}"
@@ -173,6 +176,65 @@ def make_matrix_html(matrix, head):
     html += "</table>"
 
     return html
+
+
+def load_ai_safe(place, race, date):
+    try:
+        df = get_ai(
+            place,
+            race,
+            date
+        )
+    except Exception as e:
+        return pd.DataFrame(), str(e)
+
+    if df is None or df.empty:
+        return pd.DataFrame(), "AIデータが空です。"
+
+    required_columns = [
+        "枠",
+        "選手名",
+        "AI確率%"
+    ]
+
+    missing_columns = [
+        col for col in required_columns
+        if col not in df.columns
+    ]
+
+    if missing_columns:
+        return pd.DataFrame(), f"AIデータの列が不足しています：{', '.join(missing_columns)}"
+
+    return df, ""
+
+
+def load_odds_safe(place, race, date):
+    try:
+        odds = get_odds_table(
+            place,
+            race,
+            date
+        )
+    except Exception as e:
+        return pd.DataFrame(), str(e)
+
+    if odds is None or odds.empty:
+        return pd.DataFrame(), "オッズデータが空です。"
+
+    required_columns = [
+        "買い目",
+        "オッズ"
+    ]
+
+    missing_columns = [
+        col for col in required_columns
+        if col not in odds.columns
+    ]
+
+    if missing_columns:
+        return pd.DataFrame(), f"オッズデータの列が不足しています：{', '.join(missing_columns)}"
+
+    return odds, ""
 
 
 st.title("🚤 PAMU BOAT β")
@@ -218,52 +280,62 @@ race = st.number_input(
 
 st.subheader("AI予想")
 
-df = get_ai(
+df, ai_error = load_ai_safe(
     place,
     race,
     date
 )
 
-ai_diff = df.iloc[0]["AI確率%"] - df.iloc[1]["AI確率%"]
-
-if ai_diff >= 20:
-    danger = "★☆☆☆☆"
-    comment = "イン信頼度 高"
-elif ai_diff >= 10:
-    danger = "★★★☆☆"
-    comment = "被弾注意"
+if ai_error:
+    st.info("このレースのAIデータはまだありません。")
+    with st.expander("詳細"):
+        st.write(ai_error)
 else:
-    danger = "★★★★★"
-    comment = "被弾妙味あり"
+    df = df.sort_values(
+        "AI確率%",
+        ascending=False
+    ).reset_index(drop=True)
 
-st.write(
-    f"◎ 本命：{df.iloc[0]['枠']}号艇 {df.iloc[0]['選手名']}"
-)
+    ai_diff = df.iloc[0]["AI確率%"] - df.iloc[1]["AI確率%"]
 
-st.write("🎯 推奨買い目")
+    if ai_diff >= 20:
+        danger = "★☆☆☆☆"
+        comment = "イン信頼度 高"
+    elif ai_diff >= 10:
+        danger = "★★★☆☆"
+        comment = "被弾注意"
+    else:
+        danger = "★★★★★"
+        comment = "被弾妙味あり"
 
-st.write(
-    f"{df.iloc[0]['枠']}-{df.iloc[1]['枠']}-{df.iloc[2]['枠']}"
-)
+    st.write(
+        f"◎ 本命：{df.iloc[0]['枠']}号艇 {df.iloc[0]['選手名']}"
+    )
 
-st.write(
-    f"{df.iloc[0]['枠']}-{df.iloc[2]['枠']}-{df.iloc[1]['枠']}"
-)
+    st.write("🎯 推奨買い目")
 
-st.write(
-    f"{df.iloc[1]['枠']}-{df.iloc[0]['枠']}-{df.iloc[2]['枠']}"
-)
+    st.write(
+        f"{df.iloc[0]['枠']}-{df.iloc[1]['枠']}-{df.iloc[2]['枠']}"
+    )
 
-st.dataframe(
-    df,
-    use_container_width=True,
-    hide_index=True
-)
+    st.write(
+        f"{df.iloc[0]['枠']}-{df.iloc[2]['枠']}-{df.iloc[1]['枠']}"
+    )
 
-st.subheader("🚨 被弾レーダー")
+    st.write(
+        f"{df.iloc[1]['枠']}-{df.iloc[0]['枠']}-{df.iloc[2]['枠']}"
+    )
 
-st.write(f"危険度：{danger}")
-st.write(comment)
+    st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True
+    )
+
+    st.subheader("🚨 被弾レーダー")
+
+    st.write(f"危険度：{danger}")
+    st.write(comment)
 
 st.subheader("📊 オッズ")
 
@@ -279,15 +351,25 @@ mode = st.radio(
     horizontal=True
 )
 
-odds = get_odds_table(
+odds, odds_error = load_odds_safe(
     place,
     race,
     date
 )
 
+if odds_error:
+    st.warning("オッズを取得できませんでした。")
+    with st.expander("詳細"):
+        st.write(odds_error)
+    st.stop()
+
 odds = odds[
     odds["買い目"].str.startswith(f"{head}-")
 ].copy()
+
+if odds.empty:
+    st.info("この1着固定のオッズはありません。")
+    st.stop()
 
 if mode == "一覧":
 
