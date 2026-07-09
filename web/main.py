@@ -1,5 +1,8 @@
 import os
 import sys
+import re
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 sys.path.append(
     os.path.dirname(
@@ -8,7 +11,9 @@ sys.path.append(
 )
 
 import pandas as pd
+import requests
 import streamlit as st
+from bs4 import BeautifulSoup
 
 from database.query import get_ai, get_odds_table
 
@@ -18,23 +23,58 @@ st.set_page_config(
     layout="wide"
 )
 
+PLACE_NAMES = {
+    1: "桐生", 2: "戸田", 3: "江戸川", 4: "平和島",
+    5: "多摩川", 6: "浜名湖", 7: "蒲郡", 8: "常滑",
+    9: "津", 10: "三国", 11: "びわこ", 12: "住之江",
+    13: "尼崎", 14: "鳴門", 15: "丸亀", 16: "児島",
+    17: "宮島", 18: "徳山", 19: "下関", 20: "若松",
+    21: "芦屋", 22: "福岡", 23: "唐津", 24: "大村",
+}
+
 BOAT_COLORS = {
-    1: "#ffffff",
-    2: "#222222",
-    3: "#e94b5b",
-    4: "#3f8df5",
-    5: "#f4e34f",
-    6: "#31b56a",
+    1: "#ffffff", 2: "#222222", 3: "#e94b5b",
+    4: "#3f8df5", 5: "#f4e34f", 6: "#31b56a",
 }
 
 BOAT_TEXT = {
-    1: "#111111",
-    2: "#ffffff",
-    3: "#ffffff",
-    4: "#ffffff",
-    5: "#111111",
-    6: "#ffffff",
+    1: "#111111", 2: "#ffffff", 3: "#ffffff",
+    4: "#ffffff", 5: "#111111", 6: "#ffffff",
 }
+
+
+@st.cache_data(ttl=300)
+def get_active_places(date):
+    url = f"https://www.boatrace.jp/owpc/pc/race/index?hd={date}"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Referer": "https://www.boatrace.jp/"
+    }
+
+    response = requests.get(
+        url,
+        headers=headers,
+        timeout=30
+    )
+
+    soup = BeautifulSoup(response.text, "html.parser")
+
+    place_codes = set()
+
+    for a in soup.select("a[href]"):
+        href = a.get("href", "")
+        match = re.search(r"jcd=(\d{2})", href)
+
+        if match:
+            place_codes.add(int(match.group(1)))
+
+    places = [
+        code for code in sorted(place_codes)
+        if code in PLACE_NAMES
+    ]
+
+    return places
 
 
 def boat_badge(num):
@@ -109,13 +149,34 @@ def make_matrix_html(matrix, head):
 
 st.title("🚤 PAMU BOAT β")
 
-place = st.number_input("場コード", 1, 24, 1)
-race = st.number_input("レース", 1, 12, 1)
+today = datetime.now(
+    ZoneInfo("Asia/Tokyo")
+).strftime("%Y%m%d")
 
 date = st.text_input(
     "開催日（YYYYMMDD）",
-    "20260705"
+    today
 )
+
+active_places = get_active_places(date)
+
+if not active_places:
+    st.warning("開催場を取得できませんでした。全24場を表示します。")
+    active_places = list(PLACE_NAMES.keys())
+
+place_label = st.selectbox(
+    "開催場",
+    [
+        f"{PLACE_NAMES[code]}（{code:02d}）"
+        for code in active_places
+    ]
+)
+
+place = int(
+    re.search(r"\((\d{2})\)", place_label).group(1)
+)
+
+race = st.number_input("レース", 1, 12, 1)
 
 st.subheader("AI予想")
 
