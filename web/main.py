@@ -24,22 +24,48 @@ st.set_page_config(
 )
 
 PLACE_NAMES = {
-    1: "桐生", 2: "戸田", 3: "江戸川", 4: "平和島",
-    5: "多摩川", 6: "浜名湖", 7: "蒲郡", 8: "常滑",
-    9: "津", 10: "三国", 11: "びわこ", 12: "住之江",
-    13: "尼崎", 14: "鳴門", 15: "丸亀", 16: "児島",
-    17: "宮島", 18: "徳山", 19: "下関", 20: "若松",
-    21: "芦屋", 22: "福岡", 23: "唐津", 24: "大村",
+    1: "桐生",
+    2: "戸田",
+    3: "江戸川",
+    4: "平和島",
+    5: "多摩川",
+    6: "浜名湖",
+    7: "蒲郡",
+    8: "常滑",
+    9: "津",
+    10: "三国",
+    11: "びわこ",
+    12: "住之江",
+    13: "尼崎",
+    14: "鳴門",
+    15: "丸亀",
+    16: "児島",
+    17: "宮島",
+    18: "徳山",
+    19: "下関",
+    20: "若松",
+    21: "芦屋",
+    22: "福岡",
+    23: "唐津",
+    24: "大村",
 }
 
 BOAT_COLORS = {
-    1: "#ffffff", 2: "#222222", 3: "#e94b5b",
-    4: "#3f8df5", 5: "#f4e34f", 6: "#31b56a",
+    1: "#ffffff",
+    2: "#222222",
+    3: "#e94b5b",
+    4: "#3f8df5",
+    5: "#f4e34f",
+    6: "#31b56a",
 }
 
 BOAT_TEXT = {
-    1: "#111111", 2: "#ffffff", 3: "#ffffff",
-    4: "#ffffff", 5: "#111111", 6: "#ffffff",
+    1: "#111111",
+    2: "#ffffff",
+    3: "#ffffff",
+    4: "#ffffff",
+    5: "#111111",
+    6: "#ffffff",
 }
 
 
@@ -80,6 +106,7 @@ def get_active_places(date):
 def boat_badge(num):
     bg = BOAT_COLORS[num]
     fg = BOAT_TEXT[num]
+
     return (
         f"<span style='display:inline-block;min-width:28px;"
         f"padding:4px 8px;border-radius:6px;background:{bg};"
@@ -89,7 +116,7 @@ def boat_badge(num):
 
 
 def make_matrix_html(matrix, head):
-    html = """
+    html = '''
     <style>
     .odds-table {
         width: 100%;
@@ -118,7 +145,7 @@ def make_matrix_html(matrix, head):
         font-size: 18px;
     }
     </style>
-    """
+    '''
 
     html += "<div style='margin-bottom:10px;'>"
     html += f"<b>1着固定：</b> {boat_badge(head)}"
@@ -144,6 +171,7 @@ def make_matrix_html(matrix, head):
         html += "</tr>"
 
     html += "</table>"
+
     return html
 
 
@@ -164,23 +192,37 @@ if not active_places:
     st.warning("開催場を取得できませんでした。全24場を表示します。")
     active_places = list(PLACE_NAMES.keys())
 
+place_labels = [
+    f"{PLACE_NAMES[code]}（{code:02d}）"
+    for code in active_places
+]
+
+place_map = {
+    f"{PLACE_NAMES[code]}（{code:02d}）": code
+    for code in active_places
+}
+
 place_label = st.selectbox(
     "開催場",
-    [
-        f"{PLACE_NAMES[code]}（{code:02d}）"
-        for code in active_places
-    ]
+    place_labels
 )
 
-place = int(
-    re.search(r"\((\d{2})\)", place_label).group(1)
-)
+place = place_map[place_label]
 
-race = st.number_input("レース", 1, 12, 1)
+race = st.number_input(
+    "レース",
+    1,
+    12,
+    1
+)
 
 st.subheader("AI予想")
 
-df = get_ai(place, race, date)
+df = get_ai(
+    place,
+    race,
+    date
+)
 
 ai_diff = df.iloc[0]["AI確率%"] - df.iloc[1]["AI確率%"]
 
@@ -203,9 +245,11 @@ st.write("🎯 推奨買い目")
 st.write(
     f"{df.iloc[0]['枠']}-{df.iloc[1]['枠']}-{df.iloc[2]['枠']}"
 )
+
 st.write(
     f"{df.iloc[0]['枠']}-{df.iloc[2]['枠']}-{df.iloc[1]['枠']}"
 )
+
 st.write(
     f"{df.iloc[1]['枠']}-{df.iloc[0]['枠']}-{df.iloc[2]['枠']}"
 )
@@ -217,6 +261,7 @@ st.dataframe(
 )
 
 st.subheader("🚨 被弾レーダー")
+
 st.write(f"危険度：{danger}")
 st.write(comment)
 
@@ -264,6 +309,7 @@ else:
     )
 
     for _, row in odds.iterrows():
+
         first, second, third = map(
             int,
             row["買い目"].split("-")
@@ -275,13 +321,18 @@ else:
         ] = row["オッズ"]
 
     if mode == "マトリクス":
+
         st.write("行 = 3着　　列 = 2着")
+
         st.dataframe(
             matrix,
             use_container_width=True
         )
+
     else:
+
         st.markdown(
             make_matrix_html(matrix, head),
             unsafe_allow_html=True
         )
+
